@@ -41,38 +41,40 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="bg-base-100 shadow-md">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div>
-            <Logo></Logo>
+    <header>
+      <nav className="bg-base-100 shadow-md">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div>
+              <Logo></Logo>
+            </div>
+
+            {/* Desktop Menu */}
+            <ul className="hidden md:flex gap-8 items-center">{navLinks}</ul>
+
+            {/* Right side: theme toggle + mobile button */}
+            <div className="flex items-center gap-2">
+              <ToggleTheme />
+
+              {/* Mobile Button */}
+              <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+                {isOpen ? (
+                  <span className="text-2xl">✕</span>
+                ) : (
+                  <span className="text-2xl">☰</span>
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Desktop Menu */}
-          <ul className="hidden md:flex gap-8 items-center">{navLinks}</ul>
-
-          {/* Right side: theme toggle + mobile button */}
-          <div className="flex items-center gap-2">
-            <ToggleTheme />
-
-            {/* Mobile Button */}
-            <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? (
-                <span className="text-2xl">✕</span>
-              ) : (
-                <span className="text-2xl">☰</span>
-              )}
-            </button>
-          </div>
+          {/* Mobile Menu */}
+          {isOpen && (
+            <ul className="md:hidden flex flex-col gap-4 pb-4">{navLinks}</ul>
+          )}
         </div>
-
-        {/* Mobile Menu */}
-        {isOpen && (
-          <ul className="md:hidden flex flex-col gap-4 pb-4">{navLinks}</ul>
-        )}
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 };
 
