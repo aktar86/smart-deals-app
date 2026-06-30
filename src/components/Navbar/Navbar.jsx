@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import Logo from "../Logo/Logo";
 import ToggleTheme from "../ToggleTheme/ToggleTheme";
 
@@ -56,6 +56,9 @@ const Navbar = () => {
             {/* Right side: theme toggle + mobile button */}
             <div className="flex items-center gap-2">
               <ToggleTheme />
+              <div className="hidden md:flex">
+                <Link to="/login">Login</Link>
+              </div>
 
               {/* Mobile Button */}
               <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
@@ -70,7 +73,10 @@ const Navbar = () => {
 
           {/* Mobile Menu */}
           {isOpen && (
-            <ul className="md:hidden flex flex-col gap-4 pb-4">{navLinks}</ul>
+            <>
+              <ul className="md:hidden flex flex-col gap-4 pb-4">{navLinks}</ul>
+              <Link to="/login">Login</Link>
+            </>
           )}
         </div>
       </nav>

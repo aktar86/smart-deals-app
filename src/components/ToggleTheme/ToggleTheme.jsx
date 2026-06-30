@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+// Apply saved theme before first render
+const savedTheme = localStorage.getItem("theme") || "light";
+document.documentElement.setAttribute("data-theme", savedTheme);
 
 export default function ToggleTheme() {
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "light",
-  );
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+  const [theme, setTheme] = useState(savedTheme);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
