@@ -1,9 +1,9 @@
-import useAuth from "../hooks/useAuth";
 import { Navigate, useLocation } from "react-router";
-// import Loder from "../components/Loder/Loder";
+import { AuthContext } from "../../context/AuthContext";
+import { use } from "react";
 
 const PrivetRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading } = use(AuthContext);
   const location = useLocation();
 
   if (loading) {

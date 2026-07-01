@@ -2,6 +2,7 @@ import { use } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
+import axios from "axios";
 
 const Register = () => {
   const { createUser } = use(AuthContext);
@@ -27,6 +28,7 @@ const Register = () => {
       .then((result) => {
         console.log(result.user);
         navigate(location?.state || "/");
+        axios.post("/user");
       })
       .catch((err) => {
         console.log(err.code);

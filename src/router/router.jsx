@@ -5,6 +5,9 @@ import AllProducts from "../components/AllProducts/AllProducts";
 import AuthLayout from "../layout/AuthLayout";
 import Register from "../components/Register/Register";
 import Login from "../components/Login/Login";
+import PrivetRoute from "../components/PrivetRoute/PrivetRoute";
+import MyProducts from "../components/MyProducts/MyProducts";
+import MyProfile from "../components/MyProfile/MyProfile";
 
 export const router = createBrowserRouter([
   {
@@ -20,7 +23,20 @@ export const router = createBrowserRouter([
         Component: AllProducts,
       },
       {
-        path: "allProducts",
+        path: "myProducts",
+        element: (
+          <PrivetRoute>
+            <MyProducts></MyProducts>
+          </PrivetRoute>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <PrivetRoute>
+            <MyProfile></MyProfile>
+          </PrivetRoute>
+        ),
       },
     ],
   },
