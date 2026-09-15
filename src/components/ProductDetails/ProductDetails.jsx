@@ -16,6 +16,7 @@ const ProductDetails = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [theme, setTheme] = useState(savedTheme);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { user: userID } = use(AuthContext);
   const { data: users = [] } = useQuery({
@@ -40,59 +41,9 @@ const ProductDetails = () => {
   });
   console.log(product);
 
-  // submit bid data
-  const handleSubmitBid = (e) => {
-    e.preventDefault();
-
-    const form = e.target;
-
-    const bidinfo = {
-      product_id: id,
-      buyer_image: form.buyerImage.value.trim(),
-      buyer_name: form.buyerName.value.trim(),
-      buyer_contact: form.buyerContact.value.trim(),
-      buyer_email: form.buyerEmail.value.trim(),
-      bid_price: form.bidPrice.value.trim(),
-    };
-
-    console.log(bidinfo);
-    axios
-      .post(`${import.meta.env.VITE_HOST_URL}/bids`, bidinfo)
-      .then((res) => {
-        console.log(res.data);
-        refetch;
-        if (res.data.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Success!",
-            text: res.data.message,
-            confirmButtonText: "Okay",
-          });
-
-          // Existing bid আবার check করবে
-          refetch();
-
-          // Modal close
-          setIsModalOpen(false);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-
-        Swal.fire({
-          icon: "error",
-          title: "Oops!",
-          text: "Something went wrong. Please try again.",
-          confirmButtonText: "Okay",
-        });
-      });
-
-    setIsModalOpen(false);
-  };
-
   console.log(myProfile?.email);
 
-  const { refetch, data: existingBid = null } = useQuery({
+  const { refetch: refetchExistingBid, data: existingBid = null } = useQuery({
     queryKey: ["existingBid", id, myProfile?.email],
     queryFn: async () => {
       const res = await axios.get(
@@ -111,7 +62,7 @@ const ProductDetails = () => {
   });
   console.log("existingBid:", existingBid);
 
-  const { data: bids = [] } = useQuery({
+  const { refetch: refetchBids, data: bids = [] } = useQuery({
     queryKey: ["bids", id],
     queryFn: async () => {
       const res = await axios.get(`${import.meta.env.VITE_HOST_URL}/bids`, {
@@ -125,6 +76,68 @@ const ProductDetails = () => {
     enabled: !!id,
   });
   console.log("products bids", bids);
+
+  // submit bid data
+  const handleSubmitBid = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const form = e.target;
+
+    const bidinfo = {
+      product_id: id,
+      buyer_image: form.buyerImage.value.trim(),
+      buyer_name: form.buyerName.value.trim(),
+      buyer_contact: form.buyerContact.value.trim(),
+      buyer_email: form.buyerEmail.value.trim(),
+      bid_price: form.bidPrice.value.trim(),
+    };
+
+    console.log("Bid Info:", bidinfo);
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_HOST_URL}/bids`,
+        bidinfo,
+      );
+
+      console.log("POST response:", res.data);
+
+      if (res.data.success) {
+        // প্রথমে নতুন bid list reload
+        await refetchBids();
+
+        // existing bid check reload
+        await refetchExistingBid();
+
+        // তারপর modal close
+        setIsModalOpen(false);
+
+        // form reset
+        form.reset();
+
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: res.data.message,
+          confirmButtonText: "Okay",
+        });
+      }
+    } catch (error) {
+      console.error("Bid submit error:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text:
+          error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+        confirmButtonText: "Okay",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -357,7 +370,7 @@ const ProductDetails = () => {
       </div>
       <div className="bg-white w-full mt-10 p-10 border border-gray-300 rounded-xl">
         <h1>bid profile</h1>
-        <Bidlist bids={bids}></Bidlist>
+        <Bidlist bids={bids} product={product}></Bidlist>
       </div>
     </div>
   );
