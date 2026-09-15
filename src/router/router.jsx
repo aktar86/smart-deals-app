@@ -8,6 +8,7 @@ import Login from "../components/Login/Login";
 import PrivetRoute from "../components/PrivetRoute/PrivetRoute";
 import MyProducts from "../components/MyProducts/MyProducts";
 import MyProfile from "../components/MyProfile/MyProfile";
+import ProductDetails from "../components/ProductDetails/ProductDetails";
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,14 @@ export const router = createBrowserRouter([
       {
         path: "allProducts",
         Component: AllProducts,
+      },
+      {
+        // path: "products/:id",
+        // Component: ProductDetails,
+        path: "products/:id",
+        Component: ProductDetails,
+        loader: ({ params }) =>
+          fetch(`${import.meta.env.VITE_HOST_URL}/products/${params.id}`),
       },
       {
         path: "myProducts",

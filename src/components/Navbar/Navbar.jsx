@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { Link, NavLink } from "react-router";
 import Logo from "../Logo/Logo";
 import ToggleTheme from "../ToggleTheme/ToggleTheme";
+import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logoutUser } = use(AuthContext);
 
+  const userLogOut = async () => {
+    try {
+      await logoutUser();
+      console.log("User logged out successfully");
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
   const navLinks = (
     <>
       <li>
@@ -37,6 +47,21 @@ const Navbar = () => {
           All Products
         </NavLink>
       </li>
+
+      <li>
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            `transition-colors duration-200 ${
+              isActive
+                ? "text-primary font-bold"
+                : "text-base-content hover:text-primary"
+            }`
+          }
+        >
+          My Profile
+        </NavLink>
+      </li>
     </>
   );
 
@@ -57,7 +82,16 @@ const Navbar = () => {
             <div className="flex items-center gap-2">
               <ToggleTheme />
               <div className="hidden md:flex">
-                <Link to="/login">Login</Link>
+                {user ? (
+                  <button
+                    onClick={userLogOut}
+                    className="text-red-500 cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <Link to="/login">Login</Link>
+                )}
               </div>
 
               {/* Mobile Button */}
@@ -75,7 +109,17 @@ const Navbar = () => {
           {isOpen && (
             <>
               <ul className="md:hidden flex flex-col gap-4 pb-4">{navLinks}</ul>
-              <Link to="/login">Login</Link>
+
+              {user ? (
+                <button
+                  onClick={userLogOut}
+                  className="text-red-500 cursor-pointer"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link to="/login">Login</Link>
+              )}
             </>
           )}
         </div>

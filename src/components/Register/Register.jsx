@@ -1,12 +1,14 @@
+import axios from "axios";
 import { use } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
+import { charLength, log } from "firebase/firestore/pipelines";
 
 const Register = () => {
   const { createUser } = use(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     register,
@@ -17,27 +19,45 @@ const Register = () => {
 
   const password = watch("password");
 
-  const onSubmit = (data) => {
-    if (data.password !== data.confirmPassword) {
-      return alert("Passwords do not match");
+  const onSubmit = async (data) => {
+    try {
+      if (data.password !== data.confirmPassword) {
+        return alert("Passwords do not match");
+      }
+
+      console.log("1. Form data:", data);
+
+      const result = await createUser(data.email, data.password);
+
+      console.log("2. Firebase user created:", result);
+      console.log("3. Firebase UID:", result.user.uid);
+
+      const userInfo = {
+        name: data.name,
+        email: data.email,
+        uid: result.user.uid,
+      };
+
+      console.log("4. Sending to database:", userInfo);
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_HOST_URL}/user`,
+        userInfo,
+      );
+
+      console.log("5. Database response:", response.data);
+
+      // navigate(location.state?.from || "/");
+    } catch (error) {
+      console.log("REGISTER ERROR:", error);
+      console.log("ERROR CODE:", error.code);
+      console.log("ERROR MESSAGE:", error.message);
     }
-
-    const { email, password } = data;
-
-    createUser(email, password)
-      .then((result) => {
-        console.log(result.user);
-        navigate(location?.state || "/");
-        axios.post("/user");
-      })
-      .catch((err) => {
-        console.log(err.code);
-        console.log(err.message);
-      });
   };
 
   return (
     <div>
+      <div>hello</div>
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-base-content">Create account</h2>
         <p className="text-base-content/60 mt-1">
